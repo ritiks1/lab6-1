@@ -24,9 +24,16 @@ pls=[0, 0, 1, 0, 0] # set up a pulse
 
 
 # TODO: then create a list of 6 pulses, called x, to use for input
-x = pls*6
+x = pls*6 + [0]*10 +pls*6
 
 v = stv # Set connection weight to start weight value
+
+forgetflag = True #Allows the model to stimulate the process of 
+                    #forgetting the new association that it learned
+                    # if this pulse is not for awhile, forget that
+                    # It has recently been safe to feel the pulse and
+                    # to not react (because over millions of years, it
+                    # was not safe to not react to that stimulation)
 
 ###############################
 # Set up and run simulation
@@ -51,6 +58,10 @@ for t in range(nTs):
     
     if x[t] > 0: # some stimulation occurred
         v *= dec #decrement weight
+
+    if t > 3 and sum(x[t-4:t]) == 0 and v<stv and forgetflag:
+        v+=(stv-v)*0.5 #let's forget this association we just
+                            #learned if it doesn't happen for awhile.
 
 #     then indent 4 spaces and write the equation that
 #     describes how each input value in the vector x is 
@@ -80,6 +91,6 @@ ax2.plot(y[0]) #, color='white',  antialiased=False, edgecolors='black', linewid
 ax2.set_xlabel('Time step')
 ax2.set_ylabel('Output')
 ax2.set_xlim(0, nTs)
-ax2.set_ylim(0, stv+0.5)
+#ax2.set_ylim(0, stv+0.5)
 
 plt.show()
